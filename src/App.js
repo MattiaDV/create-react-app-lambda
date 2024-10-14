@@ -1,50 +1,80 @@
-import React, { Component } from "react"
-import logo from "./logo.svg"
-import "./App.css"
+import {useState} from 'react';
+import './index.css';
+import './App.css';
 
-class LambdaDemo extends Component {
-  constructor(props) {
-    super(props)
-    this.state = { loading: false, msg: null }
+let playerUno = 0;
+let playerDue = 0;
+let totTempo = 100;
+let start = false;
+
+function MyButton() {
+  const [count, setCount] = useState(0);
+
+  function handleClick() {
+    setCount(count + 1);
+    playerUno++;
   }
 
-  handleClick = api => e => {
-    e.preventDefault()
-
-    this.setState({ loading: true })
-    fetch("/.netlify/functions/" + api)
-      .then(response => response.json())
-      .then(json => this.setState({ loading: false, msg: json.msg }))
-  }
-
-  render() {
-    const { loading, msg } = this.state
-
-    return (
-      <p>
-        <button onClick={this.handleClick("hello")}>{loading ? "Loading..." : "Call Lambda"}</button>
-        <button onClick={this.handleClick("async-dadjoke")}>{loading ? "Loading..." : "Call Async Lambda"}</button>
-        <br />
-        <span>{msg}</span>
-      </p>
-    )
-  }
+  return (
+    <button onClick={handleClick} className='bigButton' id = 'playerUnoReal'>
+      {playerUno}
+    </button>
+  );
 }
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <LambdaDemo />
-        </header>
+function MyButtonPlayer() {
+  const [count, setCount] = useState(0);
+
+  function handleClick() {
+    playerDue++;
+    setCount(count + 1);
+  }
+
+  return (
+    <button onClick={handleClick} className='bigButtonPlayer' id = 'playerDueReal'>
+      {playerDue}
+    </button>
+  );
+}
+
+let tempoRimasto = totTempo;
+
+setInterval(function() {
+  if (tempoRimasto > 0) {
+    tempoRimasto = tempoRimasto - 1;
+    document.getElementById('tempo').innerHTML = "TIME LEFT: " + tempoRimasto + "s";
+  } else {
+     if (playerDue > playerUno) {
+      alert("BLUE WIN");
+      playerDue = 0;
+      playerUno = 0;
+      tempoRimasto = totTempo;
+      document.getElementById('playerUnoReal').innerHTML = playerUno;
+      document.getElementById('playerDueReal').innerHTML = playerDue;
+     } else if (playerDue < playerUno) {
+      alert("RED WIN");
+      playerDue = 0;
+      playerUno = 0;
+      tempoRimasto = totTempo;
+      document.getElementById('playerUnoReal').innerHTML = playerUno;
+      document.getElementById('playerDueReal').innerHTML = playerDue;
+     } else {
+      alert("DRAW");
+      playerDue = 0;
+      playerUno = 0;
+      tempoRimasto = totTempo;
+      document.getElementById('playerUnoReal').innerHTML = playerUno;
+      document.getElementById('playerDueReal').innerHTML = playerDue;
+     }
+  }
+}, 1000);
+
+export default function myApp() {
+  return (
+      <div className='container'>
+        <MyButton />
+        <div id = 'tempo'>TIME LEFT: {tempoRimasto}s</div>
+        <MyButtonPlayer />
       </div>
-    )
-  }
+  )
 }
-
-export default App
